@@ -2,9 +2,11 @@ package com.abc.bank.accountmanagement.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
+import lombok.Builder;
 import lombok.Data;
 
 @Data
+@Builder
 @Schema(description = "Request body for user login")
 public class LoginRequestDTO {
     @NotBlank(message = "Username is mandatory")
