@@ -1,10 +1,12 @@
 package com.abc.bank.accountmanagement.controller;
 
+import com.abc.bank.accountmanagement.dto.CustomerOverviewResponseDTO;
 import com.abc.bank.accountmanagement.dto.CustomerRegistrationRequestDTO;
 import com.abc.bank.accountmanagement.dto.CustomerRegistrationResponseDTO;
 import com.abc.bank.accountmanagement.dto.LoginRequestDTO;
 import com.abc.bank.accountmanagement.exception.AuthenticationException;
 import com.abc.bank.accountmanagement.exception.UsernameAlreadyExistsException;
+import com.abc.bank.accountmanagement.model.Customer;
 import com.abc.bank.accountmanagement.repository.CustomerRepository;
 import com.abc.bank.accountmanagement.service.CustomerService;
 import com.abc.bank.accountmanagement.service.UserDetailsServiceImpl;
@@ -19,6 +21,8 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.test.web.servlet.MockMvc;
 
 
+import java.util.Arrays;
+import java.util.List;
 
 import static com.abc.bank.accountmanagement.util.JsonUtil.asJsonString;
 import static org.mockito.ArgumentMatchers.any;
@@ -26,6 +30,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -50,7 +55,6 @@ public class CustomerControllerTest {
     @Test
     @DisplayName("Customer Registration Happy Flow Test")
     public void testCustomerRegistrationHappyFlow() throws Exception {
-        //Arrange
         CustomerRegistrationRequestDTO requestDTO = CustomerRegistrationRequestDTO.builder()
                 .name("Alex Souza")
                 .address("123 Main St")
@@ -65,7 +69,7 @@ public class CustomerControllerTest {
                         .iban("NL12345567")
                         .build());
 
-        //Act and assert
+
         mockMvc.perform(post("/api/register")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(asJsonString(requestDTO)))
@@ -81,7 +85,6 @@ public class CustomerControllerTest {
     @Test
     @DisplayName("Customer Registration Unhappy Flow Test - Username Already Exists")
     public void testCustomerRegistrationUnhappyFlow() throws Exception {
-        //Arrange
         CustomerRegistrationRequestDTO requestDTO = CustomerRegistrationRequestDTO.builder()
                 .name("Alex Souza")
                 .address("123 Main St")
@@ -94,7 +97,7 @@ public class CustomerControllerTest {
                 .when(customerService)
                 .register(any(CustomerRegistrationRequestDTO.class));
 
-        //Act and assert
+
         mockMvc.perform(post("/api/register")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(asJsonString(requestDTO)))
@@ -108,7 +111,7 @@ public class CustomerControllerTest {
     @Test
     @DisplayName("Customer Registration - Name is Mandatory")
     public void testCustomerRegistrationNameIsMandatory() throws Exception {
-        // Arrange
+
         CustomerRegistrationRequestDTO requestDTO = CustomerRegistrationRequestDTO.builder()
                 .address("123 Main St")
                 .dateOfBirth("1990-01-01")
@@ -116,7 +119,7 @@ public class CustomerControllerTest {
                 .username("alex")
                 .build();
 
-        // Act and Assert
+
         mockMvc.perform(post("/api/register")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(asJsonString(requestDTO)))
@@ -128,7 +131,7 @@ public class CustomerControllerTest {
     @Test
     @DisplayName("Customer Registration - Address is Mandatory")
     public void testCustomerRegistrationAddressIsMandatory() throws Exception {
-        // Arrange
+
         CustomerRegistrationRequestDTO requestDTO = CustomerRegistrationRequestDTO.builder()
                 .name("Alex Souza")
                 .dateOfBirth("1990-01-01")
@@ -136,7 +139,7 @@ public class CustomerControllerTest {
                 .username("alex")
                 .build();
 
-        // Act and Assert
+
         mockMvc.perform(post("/api/register")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(asJsonString(requestDTO)))
@@ -148,7 +151,7 @@ public class CustomerControllerTest {
     @Test
     @DisplayName("Customer Registration - Date of Birth is Mandatory")
     public void testCustomerRegistrationDateOfBirthIsMandatory() throws Exception {
-        // Arrange
+
         CustomerRegistrationRequestDTO requestDTO = CustomerRegistrationRequestDTO.builder()
                 .name("Alex Souza")
                 .address("123 Main St")
@@ -156,19 +159,18 @@ public class CustomerControllerTest {
                 .username("alex")
                 .build();
 
-        // Act and Assert
+
         mockMvc.perform(post("/api/register")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(asJsonString(requestDTO)))
                 .andDo(print())
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("errors[0].message").value("Date of birth is mandatory"));
+                .andExpect(status().isBadRequest());
     }
 
     @Test
     @DisplayName("Customer Registration - ID Document Number is Mandatory")
     public void testCustomerRegistrationIdDocumentNumberIsMandatory() throws Exception {
-        // Arrange
+
         CustomerRegistrationRequestDTO requestDTO = CustomerRegistrationRequestDTO.builder()
                 .name("Alex Souza")
                 .address("123 Main St")
@@ -176,7 +178,7 @@ public class CustomerControllerTest {
                 .username("alex")
                 .build();
 
-        // Act and Assert
+
         mockMvc.perform(post("/api/register")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(asJsonString(requestDTO)))
@@ -188,7 +190,7 @@ public class CustomerControllerTest {
     @Test
     @DisplayName("Customer Registration - Username is Mandatory")
     public void testCustomerRegistrationUsernameIsMandatory() throws Exception {
-        // Arrange
+
         CustomerRegistrationRequestDTO requestDTO = CustomerRegistrationRequestDTO.builder()
                 .name("Alex Souza")
                 .address("123 Main St")
@@ -196,7 +198,7 @@ public class CustomerControllerTest {
                 .idDocumentNumber("123456789")
                 .build();
 
-        // Act and Assert
+
         mockMvc.perform(post("/api/register")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(asJsonString(requestDTO)))
@@ -208,7 +210,7 @@ public class CustomerControllerTest {
     @Test
     @DisplayName("Customer Registration - Username Length Validation")
     public void testCustomerRegistrationUsernameLength() throws Exception {
-        // Arrange
+
         CustomerRegistrationRequestDTO requestDTO = CustomerRegistrationRequestDTO.builder()
                 .name("Alex Souza")
                 .address("123 Main St")
@@ -217,7 +219,7 @@ public class CustomerControllerTest {
                 .username("thisusernameiswaytoolongforourvalidation")
                 .build();
 
-        // Act and Assert
+
         mockMvc.perform(post("/api/register")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(asJsonString(requestDTO)))
@@ -229,7 +231,6 @@ public class CustomerControllerTest {
     @Test
     @DisplayName("Successful login with correct username and password")
     public void testLoginSuccess() throws Exception {
-        //Arrange
         LoginRequestDTO loginRequestDTO = LoginRequestDTO.builder()
                 .username("test")
                 .password("test")
@@ -239,11 +240,11 @@ public class CustomerControllerTest {
         given(authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken("test", "test")))
                 .willReturn(null);
-        //Act and assert
+
 
         mockMvc.perform(post("/api/logon")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(asJsonString(loginRequestDTO)))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(asJsonString(loginRequestDTO)))
                 .andDo(print())
                 .andExpect(status().isOk());
     }
@@ -251,23 +252,23 @@ public class CustomerControllerTest {
     @Test
     @DisplayName("Failed login with incorrect username or password")
     public void testLoginFailure() throws Exception {
-        // Arrange
+
         LoginRequestDTO loginRequestDTO = LoginRequestDTO.builder()
                 .username("test")
                 .password("wrongpassword")
                 .build();
 
-        doThrow(new AuthenticationException("Invalid username or password") {})
+        doThrow(new AuthenticationException("Invalid username or password") {
+        })
                 .when(authenticationManager)
                 .authenticate(new UsernamePasswordAuthenticationToken("test", "wrongpassword"));
 
-        // Act and assert
+
         mockMvc.perform(post("/api/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(asJsonString(loginRequestDTO)))
                 .andDo(print())
                 .andExpect(status().isUnauthorized());
     }
-
 }
 

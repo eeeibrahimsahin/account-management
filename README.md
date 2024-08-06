@@ -10,9 +10,8 @@ functionality.
 
 - Java 17+
 - Maven
-- MySQL (or any other preferred database)
+- MySQL 
 - Docker
-- Docker Compose
 
 ## Setup and Running
 
@@ -21,8 +20,8 @@ functionality.
 First, clone the project to your local machine:
 
 ```bash
-git clone <repository-url>
-cd <repository-directory>
+git clone https://github.com/eeeibrahimsahin/account-management.git
+cd account-management
 ```
 ### 2. Configure the Application Properties
 Open the `src/main/resources/application.properties` file and configure the following properties according to your setup:
@@ -31,10 +30,9 @@ Open the `src/main/resources/application.properties` file and configure the foll
 spring.application.name=Account Management
 spring.datasource.url=jdbc:mysql://localhost:3307/abc_bank
 spring.datasource.username=root
-spring.datasource.password=yourpassword
+spring.datasource.password=password
 spring.datasource.driverClassName=com.mysql.cj.jdbc.Driver
 spring.jpa.hibernate.ddl-auto=update
-spring.sql.init.mode=always
 security.whitelist=/actuator/**,/swagger-ui/**,/swagger-ui.html,/v3/api-docs/**,/api/register,/api/logon
 debug.mode=true
 ```
@@ -45,14 +43,15 @@ Ensure that the MySQL database is running on the specified host and port, and up
 
 
 ### 3. Package the Application with Maven
+   To avoid issues related to the database not being up during the Maven build, you have two options:
 
-Build and package the project using Maven:
+#### Option 1: Skip Tests During Build
+Skip the tests during the build process (the tests require the database to be up), use the following command:
 
 ```bash
-mvn clean package
+mvn clean package -DskipTests
 ```
-
-### 3. Running with Docker and Docker Compose
+### 4. Running with Docker and Docker Compose
 
 #### Running with Docker
 
@@ -62,13 +61,7 @@ To run the application as a Docker container, first build the Docker image:
 docker build -t abc-bank-api .
 ````
 
-Then, run the Docker container:
-
-```bash
-docker run -p 8080:8080 abc-bank-api
-```
-
-#### Running with Docker Compose
+#### Running with Docker Compose - DB and APP together
 Run the application and the database together using Docker Compose:
 
 ```bash
@@ -154,22 +147,26 @@ Access the API documentation and test it via Swagger UI:
 http://localhost:8080/swagger-ui.html
 ```
 ### Postman Collection
-Import the provided Postman collection to test various API scenarios.
+Import the provided Postman collection (`postman_collection.json`) to test various API scenarios.
 
 ### Error Handling
 The application distinguishes between technical (HTTP 500) and functional (HTTP 400) errors. Errors are returned with appropriate messages.
 
 ## Design Decisions and Alternatives
 
-### Rate Limiting
+### Rate Limiting for DB
 
 - **Current Solution**: The `bucket4j` library was used for rate limiting as a simple solution to control the number of requests sent to the database.
-- **Alternative Solutions**: More robust queuing solutions like RabbitMQ or Kafka could be implemented for better scalability and fault tolerance.
+- **Alternative Solutions**: '
+  - More robust queuing solutions like RabbitMQ or Kafka could be implemented for better scalability and fault tolerance.
+  -  Additionally, limiting the number of database connections can also serve as an effective way to control the load on the database, ensuring stability and consistent performance under heavy request volumes.
 
 ### Authentication Mechanism
 
 - **Current Solution**: Basic HTTP authentication is used for simplicity.
-- **Alternative Solutions**: Implementing JWT (JSON Web Token) for stateless and more secure authentication would be a better solution.
+- **Alternative Solutions**: 
+  - Implementing JWT (JSON Web Token) for stateless and more secure authentication would be a better solution.
+  - Additionally, considering OAuth2 could provide a more secure and flexible framework for access delegation, which is particularly useful in applications that require integration with other services.
 
 
 ### Contact

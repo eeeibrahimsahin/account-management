@@ -2,7 +2,6 @@ package com.abc.bank.accountmanagement.service;
 
 import com.abc.bank.accountmanagement.dto.CustomerRegistrationRequestDTO;
 import com.abc.bank.accountmanagement.dto.CustomerRegistrationResponseDTO;
-import com.abc.bank.accountmanagement.exception.AuthenticationException;
 import com.abc.bank.accountmanagement.exception.UsernameAlreadyExistsException;
 import com.abc.bank.accountmanagement.mapper.CustomerMapper;
 import com.abc.bank.accountmanagement.model.Customer;
@@ -86,39 +85,4 @@ public class CustomerServiceTest {
         verify(databaseService, never()).saveCustomer(any(Customer.class));
     }
 
-    @Test
-    @DisplayName("Login should succeed with correct credentials")
-    public void testLoginSuccess() {
-        given(databaseService.findCustomerByUsername(any())).willReturn(customer);
-
-        Customer loggedInCustomer = customerService.login("alex", "12345");
-
-        assertNotNull(loggedInCustomer);
-        assertEquals("alex", loggedInCustomer.getUsername());
-        verify(databaseService, times(1)).findCustomerByUsername("alex");
-    }
-
-    @Test
-    @DisplayName("Login should fail with incorrect username")
-    public void testLoginUsernameNotFound() {
-        given(databaseService.findCustomerByUsername(anyString())).willReturn(null);
-
-        assertThrows(AuthenticationException.class, () -> {
-            customerService.login("wrongUsername", "12345");
-        });
-
-        verify(databaseService, times(1)).findCustomerByUsername("wrongUsername");
-    }
-
-    @Test
-    @DisplayName("Login should fail with incorrect password")
-    public void testLoginIncorrectPassword() {
-        given(databaseService.findCustomerByUsername(anyString())).willReturn(customer);
-
-        assertThrows(AuthenticationException.class, () -> {
-            customerService.login("alex", "wrongPassword");
-        });
-
-        verify(databaseService, times(1)).findCustomerByUsername("alex");
-    }
 }

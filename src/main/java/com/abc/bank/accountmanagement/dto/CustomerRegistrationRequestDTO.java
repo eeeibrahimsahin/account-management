@@ -1,5 +1,6 @@
 package com.abc.bank.accountmanagement.dto;
 
+import com.abc.bank.accountmanagement.validation.ValidDateOfBirth;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -20,6 +21,7 @@ public class CustomerRegistrationRequestDTO {
     private String address;
 
     @NotBlank(message = "Date of birth is mandatory")
+    @ValidDateOfBirth
     @Schema(description = "Date of birth of the customer", example = "1990-01-01")
     private String dateOfBirth;
 

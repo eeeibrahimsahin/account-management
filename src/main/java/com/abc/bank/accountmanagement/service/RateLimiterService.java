@@ -10,7 +10,7 @@ import java.time.Duration;
 
 @Service
 public class RateLimiterService {
-    private final Bucket bucket;
+    private Bucket bucket;
 
     public RateLimiterService() {
         Bandwidth limit = Bandwidth.classic(2, Refill.greedy(2, Duration.ofSeconds(1)));

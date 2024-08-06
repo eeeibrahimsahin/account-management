@@ -18,7 +18,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
-@SpringBootTest
+@SpringBootTest(classes = DatabaseServiceImpl.class)
 class DatabaseServiceTest {
 
     @MockBean
